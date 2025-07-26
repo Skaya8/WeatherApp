@@ -1,0 +1,340 @@
+@model WeatherApp.Models.WeatherViewModel
+
+@{
+    ViewData["Title"] = "Weather Search";
+    var cities = new[] {
+        "London", "New York", "Paris", "Tokyo", "Cairo", "Sydney",
+        "Berlin", "Madrid", "Rome", "Toronto", "Dubai", "Riyadh", "Mumbai", "Cape Town", "Rio de Janeiro",
+        "Los Angeles", "Chicago", "Moscow", "Singapore", "Hong Kong", "Seoul", "Mexico City", "Istanbul", "Bangkok", "Buenos Aires", "San Francisco", "Vancouver"
+    };
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <h2 class="mb-3">Weather Search</h2>
+            <form id="weatherForm" method="post">
+                <div class="form-group mb-4 d-flex flex-row align-items-end gap-3 flex-wrap">
+                    <div class="flex-grow-1">
+                        <label for="city" class="form-label" style="font-size:1.15rem;font-weight:600;">Select City</label>
+                        <select id="city" name="City" class="form-control search-select">
+                            <option value="">-- Select a city --</option>
+                            @foreach (var city in cities)
+                            {
+                                <option value="@city">@city</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="button" id="fetchWeather" class="btn btn-primary search-btn mb-2" style="min-width:180px;">Fetch Weather</button>
+                </div>
+            </form>
+            <div id="weatherResult" class="mt-4" style="display:none;">
+                <div class="weather-glass-card">
+                  <div class="weather-card-header">
+                    <span class="city-name" id="cityName"></span>
+                    <span class="weather-date" id="weatherDate"></span>
+                  </div>
+                  <div class="weather-icon-center">
+                    <img id="icon" src="" alt="Weather Icon" />
+                  </div>
+                  <div class="weather-temp-main" id="currentTemp"></div>
+                  <div class="weather-condition-main" id="condition"></div>
+                  <div class="weather-details-group" style="display: flex; flex-direction: column; align-items: center;">
+                    <div class="weather-details-row">
+                      <div class="detail-center">
+                        <div id="lottie-humidity-detail" class="lottie-inline"></div>
+                        <label for="humidity">Humidity</label>
+                        <span class="detail-value"><span id="humidity"></span>%</span>
+                      </div>
+                      <div class="detail-center">
+                        <div id="lottie-tempmax-detail" class="lottie-inline"></div>
+                        <label for="tempMax">Max Temp</label>
+                        <span class="detail-value"><span id="tempMax"></span>&deg;C</span>
+                      </div>
+                    </div>
+                    <div class="weather-details-row">
+                      <div class="detail-center">
+                        <div id="lottie-wind-detail" class="lottie-inline"></div>
+                        <label for="windSpeed">Wind</label>
+                        <span class="detail-value"><span id="windSpeed"></span> m/s <span id="windDeg"></span>&deg;</span>
+                      </div>
+                      <div class="detail-center">
+                        <div id="lottie-tempmin-detail" class="lottie-inline"></div>
+                        <label for="tempMin">Min Temp</label>
+                        <span class="detail-value"><span id="tempMin"></span>&deg;C</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" id="saveWeather" class="btn btn-primary w-100 mt-3">Save Result</button>
+                  <div id="saveMessage" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        $('#fetchWeather').click(function () {
+            var city = $('#city').val();
+            if (!city) {
+                alert('Please select a city.');
+                return;
+            }
+           
+            $.get('https://api.openweathermap.org/data/2.5/weather', {
+                q: city,
+                appid: '866f391b28d97314555386b846feb991', 
+                units: 'metric'
+            }, function (data) {
+                $('#cityName').text(city);
+                $('#condition').text(data.weather[0].main + ' (' + data.weather[0].description + ')');
+                // Use OpenWeatherMap icon
+                $('#icon').attr('src', 'https://openweathermap.org/img/wn/' + data.weather[0].icon + '.png');
+                // Date
+                var today = new Date();
+                var dateStr = today.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+                $('#weatherDate').text('Today, ' + dateStr);
+                $('#currentTemp').text(data.main.temp + '°C');
+                $('#humidity').text(data.main.humidity);
+                $('#tempMin').text(data.main.temp_min);
+                $('#tempMax').text(data.main.temp_max);
+                $('#windSpeed').text(data.wind.speed);
+                $('#windDeg').text(data.wind.deg);
+                $('#weatherResult').show();
+            }).fail(function () {
+                alert('Failed to fetch weather data.');
+            });
+        });
+        $('#saveWeather').click(function () {
+            var city = $('#city').val();
+            var humidity = parseInt($('#humidity').text());
+            var tempMin = parseFloat($('#tempMin').text());
+            var tempMax = parseFloat($('#tempMax').text());
+            var condition = $('#condition').text();
+            var currentTemp = parseFloat($('#currentTemp').text());
+            var windSpeed = parseFloat($('#windSpeed').text());
+            var windDeg = parseInt($('#windDeg').text());
+            var icon = '';
+            $.post('/Weather/Save', {
+                City: city,
+                Humidity: humidity,
+                TempMin: tempMin,
+                TempMax: tempMax,
+                Condition: condition,
+                CurrentTemp: currentTemp,
+                WindSpeed: windSpeed,
+                WindDeg: windDeg,
+                Icon: icon
+            }, function (response) {
+                $('#saveMessage').text(response.message).addClass('alert alert-success');
+            }).fail(function () {
+                $('#saveMessage').text('Failed to save weather data.').addClass('alert alert-danger');
+            });
+        });
+        // Lottie animations for weather details
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-temp'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/thermometer.json'
+        });
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-humidity-card'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/humidity.json'
+        });
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-wind-card'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/wind.json'
+        });
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-tempmin'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/thermometer-cold.json'
+        });
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-tempmax'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/thermometer-hot.json'
+        });
+        // Lottie animations for weather details row
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-wind-detail'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/wind.json'
+        });
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-humidity-detail'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/humidity.json'
+        });
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-tempmin-detail'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/thermometer-cold.json'
+        });
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-tempmax-detail'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottie/thermometer-hot.json'
+        });
+    });
+    </script>
+}
+
+<style>
+.search-select {
+  border-radius: 1.2rem;
+  font-size: 1.1rem;
+  padding: 0.75rem 1.2rem;
+  border: 2px solid var(--orange);
+  background: #f8f4ff;
+  color: var(--dark-blue);
+  box-shadow: 0 2px 8px #77bef033;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+.search-select:focus {
+  border-color: var(--dark-blue);
+  box-shadow: 0 0 0 2px #77bef033;
+}
+.search-btn {
+  font-size: 1.15rem;
+  font-weight: 700;
+  border-radius: 2rem;
+  padding: 0.75rem 0;
+  box-shadow: 0 2px 8px #0d355733;
+  letter-spacing: 0.5px;
+  background: var(--dark-blue);
+  color: #fff;
+  border: none;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.search-btn:hover, .search-btn:focus {
+  background: var(--medium-blue);
+  color: #fff;
+  transform: scale(1.03);
+}
+
+
+.weather-glass-card {
+  max-width: 400px;
+  margin: 2.5rem auto;
+  padding: 2.5rem 2rem 2rem 2rem;
+  background: linear-gradient(135deg, #f8fbff 60%, #e6f9ed 100%);
+  border-radius: 2.5rem;
+  box-shadow: 0 8px 32px #0d35571a;
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255,255,255,0.18);
+  position: relative;
+  color: var(--dark-blue);
+}
+.weather-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 1.5rem;
+  color: var(--dark-blue);
+}
+.weather-icon-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+.weather-icon-center img {
+  width: 100px;
+  height: 100px;
+  filter: drop-shadow(0 4px 16px #77bef088);
+}
+.weather-temp-main {
+  text-align: center;
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: var(--dark-blue);
+  margin-bottom: 1.2rem;
+}
+.weather-condition-main {
+  text-align: center;
+  font-size: 1.3rem;
+  margin-bottom: 2.2rem;
+  color: var(--medium-blue);
+}
+.weather-details-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 2.2rem;
+  margin-top: 1.5rem;
+}
+.weather-details-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  font-size: 1.08rem;
+  gap: 3.5rem;
+}
+.detail-icon {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+  margin-right: 0.2rem;
+}
+.lottie-inline {
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 0.2rem;
+}
+.detail-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 110px;
+}
+.detail-center label {
+  font-weight: 700;
+  color: var(--dark-blue);
+  font-size: 1.08rem;
+  margin-bottom: 0.1rem;
+  letter-spacing: 0.2px;
+}
+.detail-center .detail-value {
+  color: #222b45;
+  font-size: 1.13rem;
+  font-weight: 600;
+  margin-top: 0.1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.2em;
+}
+media (max-width: 768px) {
+  .weather-glass-card { padding: 1.2rem 0.7rem; }
+  .weather-details-row { gap: 1.2rem; }
+  .detail-center { min-width: 80px; }
+}
+</style>

@@ -1,0 +1,128 @@
+﻿@{
+    var isLoggedIn = Context.Session.GetInt32("UserId") != null;
+    var isLoginPage = (ViewContext.RouteData.Values["controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["action"]?.ToString() == "Login");
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WeatherApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm custom-navbar sticky-top mb-4">
+            <div class="container-fluid d-flex align-items-center justify-content-between">
+                <a class="navbar-brand custom-navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WeatherApp</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav flex-row gap-2 gap-md-3 ms-auto">
+                        @if (!isLoginPage)
+                        {
+                            @if (isLoggedIn)
+                            {
+                                <li class="nav-item"><a class="nav-link custom-nav-link @(currentController == "Weather" ? "active" : "")" asp-controller="Weather" asp-action="Index">Weather</a></li>
+                                <li class="nav-item"><a class="nav-link custom-nav-link @(currentController == "History" ? "active" : "")" asp-controller="History" asp-action="Index">History</a></li>
+                                <li class="nav-item"><a class="nav-link custom-nav-link @(currentController == "Account" && currentAction == "Logout" ? "active" : "")" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                            }
+                            else
+                            {
+                                <li class="nav-item"><a class="nav-link custom-nav-link @(currentController == "Account" && currentAction == "Login" ? "active" : "")" asp-controller="Account" asp-action="Login">Login</a></li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+<style>
+.custom-navbar {
+  background: rgba(119,190,240,0.85);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px #0d355733;
+  border-radius: 1.5rem;
+  border: 1.5px solid #e3f6fd;
+  padding: 0.7rem 1.5rem;
+  margin-top: 1.2rem;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.custom-navbar-brand {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--dark-blue) !important;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 8px #77bef033;
+  margin-right: 2.5rem;
+}
+.custom-nav-link {
+  color: var(--dark-blue) !important;
+  font-size: 1.13rem;
+  font-weight: 600;
+  border-radius: 1.2rem;
+  padding: 0.5rem 1.2rem;
+  position: relative;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.1s;
+  overflow: hidden;
+}
+.custom-nav-link:hover, .custom-nav-link:focus {
+  background: var(--sky-blue);
+  color: #fff !important;
+  text-decoration: none;
+}
+.custom-nav-link::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2.5px;
+  background: var(--dark-blue);
+  transition: width 0.2s;
+  position: absolute;
+  left: 20%;
+  bottom: 8px;
+}
+.custom-nav-link:hover::after, .custom-nav-link:focus::after {
+  width: 60%;
+  background: var(--sky-blue);
+}
+.navbar-nav .nav-item:last-child .custom-nav-link {
+  margin-right: 0;
+}
+media (max-width: 768px) {
+  .custom-navbar { border-radius: 0; margin-top: 0; padding: 0.5rem 0.5rem; }
+  .custom-navbar-brand { font-size: 1.4rem; margin-right: 1rem; }
+  .custom-nav-link { font-size: 1rem; padding: 0.5rem 0.8rem; }
+  .navbar-nav { flex-direction: column !important; gap: 0.2rem !important; }
+}
+.custom-nav-link.active, .custom-nav-link.active:focus {
+  background: var(--dark-blue);
+  color: #fff !important;
+  box-shadow: 0 2px 8px #0d355733;
+  text-decoration: none;
+}
+.custom-nav-link.active::after {
+  width: 100%;
+  background: var(--sky-blue);
+}
+</style>

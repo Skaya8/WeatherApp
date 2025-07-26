@@ -10,7 +10,8 @@ namespace WeatherApp.Services.Repositories
 
         public CityRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection") 
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
         public async Task<List<string>> GetAllCitiesAsync()

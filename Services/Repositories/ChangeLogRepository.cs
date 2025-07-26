@@ -12,7 +12,8 @@ namespace WeatherApp.Services.Repositories
 
         public ChangeLogRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection") 
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
         public async Task<List<WeatherSearchChangeLog>> GetWeatherSearchChangesAsync(int weatherSearchId)

@@ -26,7 +26,7 @@ namespace WeatherApp.Controllers
             if (userId != null)
             {
                 HttpContext.Session.SetInt32("UserId", userId.Value);
-                HttpContext.Session.SetString("Username", model.Username);
+                HttpContext.Session.SetString("Username", model.Username ?? "");
                 return RedirectToAction("Index", "Weather");
             }
             model.ErrorMessage = "Invalid username or password";

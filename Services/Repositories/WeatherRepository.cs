@@ -12,7 +12,8 @@ namespace WeatherApp.Services.Repositories
 
         public WeatherRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection") 
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
         public async Task<List<WeatherSearchResult>> GetWeatherSearchesAsync(

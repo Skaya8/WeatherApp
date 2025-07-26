@@ -11,7 +11,8 @@ namespace WeatherApp.Services
 
         public WeatherDbService(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection") 
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
         public async Task<int?> ValidateUserAsync(string username, string password)

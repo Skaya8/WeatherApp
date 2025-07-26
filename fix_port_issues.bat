@@ -3,7 +3,6 @@ echo ========================================
 echo WeatherApp Port Conflict Fixer
 echo ========================================
 echo.
-
 echo Checking for processes using port 5043...
 netstat -ano | findstr :5043
 if %errorlevel% equ 0 (
@@ -30,7 +29,19 @@ if %errorlevel% equ 0 (
 ) else (
     echo No processes found using port 5043.
 )
-
+echo.
+echo Checking for processes using port 7261...
+netstat -ano | findstr :7261
+if %errorlevel% equ 0 (
+    echo.
+    echo Found processes using port 7261:
+    netstat -ano | findstr :7261
+    echo.
+    echo You may need to kill these processes manually:
+    echo taskkill /PID [PID_NUMBER] /F
+) else (
+    echo No processes found using port 7261.
+)
 echo.
 echo ========================================
 echo Port check complete!

@@ -11,7 +11,7 @@ WeatherApp is a web-based application that allows users to search for weather in
 - Real-time weather data retrieval from OpenWeatherMap API
 - Support for 27 major cities worldwide including Riyadh, London, New York, Tokyo, and more
 - Comprehensive weather information display (temperature, humidity, wind speed, conditions)
-- User authentication and session management
+- User authentication and session management (with secure password hashing)
 - Weather search history with filtering and search capabilities
 - Edit functionality for saved weather records
 - Responsive design optimized for desktop and mobile devices
@@ -45,16 +45,12 @@ Before running this application, ensure you have the following software installe
    - Select "New Database"
    - Name the database `WeatherAppDB`
    - Click "OK" to create
-4. Execute the database initialization scripts:
-   - Open `Database/README.md` for detailed SQL scripts
-   - Execute table creation scripts first, followed by stored procedures
-5. Initialize test user accounts:
+4. **Recommended:** Open and execute the complete script `Database/WeatherAppDB_Complete_Schema.sql` to create all tables, stored procedures, and test users with secure password hashes.
+5. **Manual Option:** See `Database/README.md` for step-by-step SQL scripts and explanations.
+6. **Test User Creation (Secure):**
    ```sql
-   INSERT INTO Users (Username, Password) VALUES ('user1', '12345678');
-   INSERT INTO Users (Username, Password) VALUES ('user2', '12345678');
-   INSERT INTO Users (Username, Password) VALUES ('user3', '12345678');
-   INSERT INTO Users (Username, Password) VALUES ('user4', '12345678');
-   INSERT INTO Users (Username, Password) VALUES ('user5', '12345678');
+   -- If you need to add more users, use this format:
+   INSERT INTO Users (Username, PasswordHash) VALUES ('newuser', HASHBYTES('SHA2_256', 'yourpassword'));
    GO
    ```
 
@@ -99,6 +95,7 @@ WeatherApp/
 │   ├── js/
 │   └── lottie/
 ├── Database/            # Database Scripts
+│   └── WeatherAppDB_Complete_Schema.sql
 ├── Program.cs           # Application Entry Point
 ├── appsettings.json     # Configuration
 └── WeatherApp.csproj    # Project File
@@ -131,8 +128,8 @@ The default connection string in `appsettings.json` is configured for LocalDB:
 ### Common Issues and Solutions
 
 **Port Conflict Resolution**
-- If port 5043 is already in use, execute `fix_port_issues.bat` to automatically resolve conflicts
-- Alternatively, manually terminate processes using the port or modify `Properties/launchSettings.json`
+- If port 5043 or 7261 is already in use, execute `fix_port_issues.bat` to automatically resolve conflicts. The script now checks both ports and helps you kill any locked processes.
+- Alternatively, manually terminate processes using the port or modify `Properties/launchSettings.json`.
 
 **Database Connection Issues**
 - Verify LocalDB is properly installed and running
@@ -143,6 +140,10 @@ The default connection string in `appsettings.json` is configured for LocalDB:
 - Clean the solution (Build → Clean Solution)
 - Rebuild the solution (Build → Rebuild Solution)
 - Verify all NuGet packages are properly restored
+
+**Authentication Issues**
+- Ensure passwords are inserted using SHA2_256 hashing as shown above
+- Use the provided stored procedure `sp_ValidateUser` for secure login
 
 ## Technology Stack
 
@@ -161,6 +162,7 @@ The default connection string in `appsettings.json` is configured for LocalDB:
 For detailed setup instructions with screenshots and advanced configuration options, refer to:
 - [VISUAL_STUDIO_SETUP.md](VISUAL_STUDIO_SETUP.md) - Comprehensive Visual Studio setup guide
 - [Database/README.md](Database/README.md) - Database schema and initialization scripts
+- [Database/WeatherAppDB_Complete_Schema.sql](Database/WeatherAppDB_Complete_Schema.sql) - Full database setup script
 
 ## License
 

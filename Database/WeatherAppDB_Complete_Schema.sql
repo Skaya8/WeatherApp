@@ -36,10 +36,10 @@ CREATE TABLE [dbo].[WeatherSearches](
     [TempMin] [float] NOT NULL,
     [TempMax] [float] NOT NULL,
     [SearchDate] [date] NOT NULL,
-    [Condition] [nvarchar](200) NULL,
-    [CurrentTemp] [float] NULL,
-    [WindSpeed] [float] NULL,
-    [WindDeg] [int] NULL,
+    [Condition] [nvarchar](200) NOT NULL,
+    [CurrentTemp] [float] NOT NULL,
+    [WindSpeed] [float] NOT NULL,
+    [WindDeg] [int] NOT NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC)
 ) ON [PRIMARY]
 GO
@@ -54,8 +54,8 @@ CREATE TABLE [dbo].[WeatherSearchChangeLog](
     [UserId] [int] NOT NULL,
     [ChangeDate] [datetime] NOT NULL DEFAULT (getdate()),
     [ChangeType] [nvarchar](100) NOT NULL,
-    [OldValue] [nvarchar](255) NULL,
-    [NewValue] [nvarchar](255) NULL,
+    [OldValue] [nvarchar](255) NOT NULL,
+    [NewValue] [nvarchar](255) NOT NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC)
 ) ON [PRIMARY]
 GO
@@ -114,10 +114,10 @@ CREATE PROCEDURE [dbo].[sp_InsertWeatherSearch]
     @TempMin FLOAT,
     @TempMax FLOAT,
     @SearchDate DATE,
-    @Condition NVARCHAR(200) = NULL,
-    @CurrentTemp FLOAT = NULL,
-    @WindSpeed FLOAT = NULL,
-    @WindDeg INT = NULL
+    @Condition NVARCHAR(200),
+    @CurrentTemp FLOAT,
+    @WindSpeed FLOAT,
+    @WindDeg INT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -211,10 +211,10 @@ CREATE PROCEDURE [dbo].[sp_UpdateWeatherSearch]
     @Humidity INT,
     @TempMin FLOAT,
     @TempMax FLOAT,
-    @CurrentTemp FLOAT = NULL,
-    @Condition NVARCHAR(200) = NULL,
-    @WindSpeed FLOAT = NULL,
-    @WindDeg INT = NULL,
+    @CurrentTemp FLOAT,
+    @Condition NVARCHAR(200),
+    @WindSpeed FLOAT,
+    @WindDeg INT,
     @ChangeType NVARCHAR(100),
     @OldValue NVARCHAR(500),
     @NewValue NVARCHAR(500)

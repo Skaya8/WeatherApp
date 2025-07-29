@@ -54,52 +54,6 @@ Execute the complete schema script:
 -- File: WeatherAppDB_Complete_Schema.sql
 ```
 
-## Table Structures
-
-### Users Table
-```sql
-CREATE TABLE [dbo].[Users](
-    [Id] [int] IDENTITY(1,1) NOT NULL,
-    [Username] [nvarchar](50) NOT NULL,
-    [PasswordHash] [varbinary](256) NOT NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC),
-    UNIQUE NONCLUSTERED ([Username] ASC)
-);
-```
-
-### WeatherSearches Table
-```sql
-CREATE TABLE [dbo].[WeatherSearches](
-    [Id] [int] IDENTITY(1,1) NOT NULL,
-    [UserId] [int] NOT NULL,
-    [City] [nvarchar](100) NOT NULL,
-    [Humidity] [int] NOT NULL,
-    [TempMin] [float] NOT NULL,
-    [TempMax] [float] NOT NULL,
-    [SearchDate] [date] NOT NULL,
-    [Condition] [nvarchar](200) NULL,
-    [CurrentTemp] [float] NULL,
-    [WindSpeed] [float] NULL,
-    [WindDeg] [int] NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC)
-);
-```
-
-**Note:** Weather icons are generated dynamically from condition names using the OpenWeatherMap API.
-
-### WeatherSearchChangeLog Table
-```sql
-CREATE TABLE [dbo].[WeatherSearchChangeLog](
-    [Id] [int] IDENTITY(1,1) NOT NULL,
-    [WeatherSearchId] [int] NOT NULL,
-    [UserId] [int] NOT NULL,
-    [ChangeDate] [datetime] NOT NULL DEFAULT (getdate()),
-    [ChangeType] [nvarchar](100) NOT NULL,
-    [OldValue] [nvarchar](255) NULL,
-    [NewValue] [nvarchar](255) NULL,
-    PRIMARY KEY CLUSTERED ([Id] ASC)
-);
-```
 
 ## Foreign Key Relationships
 
@@ -147,20 +101,6 @@ The schema includes sample users with the following credentials:
    - Execute the complete schema script
    - Verify all stored procedures are created
 
-### Verification Queries
-
-```sql
--- Check tables exist
-SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
-WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'dbo';
-
--- Check stored procedures exist
-SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES 
-WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA = 'dbo';
-
--- Test user authentication
-EXEC sp_ValidateUser 'user1', '12345678';
-```
 
 ## Maintenance
 

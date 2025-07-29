@@ -19,7 +19,7 @@ The WeatherApp database consists of four main tables and seven stored procedures
 1. **Users** - User authentication and management with secure password hashing
 2. **WeatherSearches** - Weather data storage and retrieval
 3. **WeatherSearchChanges** - Audit trail for data modifications with user tracking
-4. **WeatherSearchChangeLog** - Additional change logging with username tracking
+4. **WeatherSearchChangeLog** - Change logging with user tracking
 
 ### Stored Procedures
 
@@ -113,6 +113,14 @@ GO
 ALTER TABLE [dbo].[WeatherSearchChanges] 
 ADD CONSTRAINT [FK_WeatherSearchChanges_WeatherSearches] 
 FOREIGN KEY([WeatherSearchId]) REFERENCES [dbo].[WeatherSearches] ([Id]);
+
+ALTER TABLE [dbo].[WeatherSearchChangeLog] 
+ADD CONSTRAINT [FK_WeatherSearchChangeLog_WeatherSearches] 
+FOREIGN KEY([WeatherSearchId]) REFERENCES [dbo].[WeatherSearches] ([Id]);
+
+ALTER TABLE [dbo].[WeatherSearchChangeLog] 
+ADD CONSTRAINT [FK_WeatherSearchChangeLog_Users] 
+FOREIGN KEY([UserId]) REFERENCES [dbo].[Users] ([Id]);
 GO
 ```
 
@@ -121,11 +129,11 @@ GO
 CREATE TABLE [dbo].[WeatherSearchChangeLog](
     [Id] [int] IDENTITY(1,1) NOT NULL,
     [WeatherSearchId] [int] NOT NULL,
+    [UserId] [int] NULL,
     [ChangeDate] [datetime] NOT NULL DEFAULT (getdate()),
     [ChangeType] [nvarchar](100) NOT NULL,
     [OldValue] [nvarchar](255) NULL,
     [NewValue] [nvarchar](255) NULL,
-    [Username] [nvarchar](100) NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 GO
@@ -296,8 +304,8 @@ BEGIN
         WindDeg = @WindDeg
     WHERE Id = @WeatherSearchId;
 
-    INSERT INTO WeatherSearchChangeLog (WeatherSearchId, ChangeDate, ChangeType, OldValue, NewValue, Username)
-    VALUES (@WeatherSearchId, GETDATE(), @ChangeType, @OldValue, @NewValue, (SELECT Username FROM Users WHERE Id = @UserId));
+    INSERT INTO WeatherSearchChangeLog (WeatherSearchId, UserId, ChangeDate, ChangeType, OldValue, NewValue)
+    VALUES (@WeatherSearchId, @UserId, GETDATE(), @ChangeType, @OldValue, @NewValue);
 END
 GO
 ```
@@ -308,7 +316,7 @@ CREATE PROCEDURE [dbo].[sp_GetWeatherSearchChanges]
     @WeatherSearchId INT
 AS
 BEGIN
-    SELECT *
+    SELECT Id, WeatherSearchId, UserId, ChangeDate, ChangeType, OldValue, NewValue
     FROM WeatherSearchChangeLog
     WHERE WeatherSearchId = @WeatherSearchId
     ORDER BY ChangeDate DESC

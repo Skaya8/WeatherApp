@@ -214,7 +214,7 @@ namespace WeatherApp.Services
                     ChangeType = reader.GetString(reader.GetOrdinal("ChangeType")),
                     OldValue = reader["OldValue"]?.ToString(),
                     NewValue = reader["NewValue"]?.ToString(),
-                    Username = reader["Username"]?.ToString()
+                    UserId = reader["UserId"] != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("UserId")) : (int?)null
                 });
             }
             return logs;

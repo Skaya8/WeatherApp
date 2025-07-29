@@ -6,6 +6,6 @@ namespace WeatherApp.Models
         public string? ChangeType { get; set; }
         public string? OldValue { get; set; }
         public string? NewValue { get; set; }
-        public string? Username { get; set; }
+        public int? UserId { get; set; }
     }
 } 

@@ -11,6 +11,6 @@ namespace WeatherApp.Models
         public double? CurrentTemp { get; set; }
         public double? WindSpeed { get; set; }
         public int? WindDeg { get; set; }
-        public string? Icon { get; set; }
+
     }
 } 

@@ -14,7 +14,7 @@ namespace WeatherApp.Services.Repositories
         public const string GetWeatherSearchById = @"
             SELECT ws.Id, ws.UserId, ws.City, ws.Humidity, ws.TempMin, ws.TempMax, 
                    ws.SearchDate, u.Username, ws.Condition, ws.CurrentTemp, 
-                   ws.WindSpeed, ws.WindDeg, ws.Icon 
+                   ws.WindSpeed, ws.WindDeg
             FROM WeatherSearches ws 
             JOIN Users u ON ws.UserId = u.Id 
             WHERE ws.Id = @Id";

@@ -47,8 +47,7 @@ namespace WeatherApp.Services.Repositories
                     Condition = reader.IsDBNull(8) ? null : reader.GetString(8),
                     CurrentTemp = reader.IsDBNull(9) ? (double?)null : reader.GetDouble(9),
                     WindSpeed = reader.IsDBNull(10) ? (double?)null : reader.GetDouble(10),
-                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11),
-                    Icon = reader.IsDBNull(12) ? null : reader.GetString(12)
+                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11)
                 });
             }
             return results;
@@ -89,8 +88,7 @@ namespace WeatherApp.Services.Repositories
                     Condition = reader.IsDBNull(8) ? null : reader.GetString(8),
                     CurrentTemp = reader.IsDBNull(9) ? (double?)null : reader.GetDouble(9),
                     WindSpeed = reader.IsDBNull(10) ? (double?)null : reader.GetDouble(10),
-                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11),
-                    Icon = reader.IsDBNull(12) ? null : reader.GetString(12)
+                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11)
                 });
             }
             if (await reader.NextResultAsync() && await reader.ReadAsync())
@@ -150,8 +148,8 @@ namespace WeatherApp.Services.Repositories
         public async Task<WeatherSearchResult?> GetWeatherSearchByIdAsync(int id)
         {
             using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("SELECT ws.Id, ws.UserId, ws.City, ws.Humidity, ws.TempMin, ws.TempMax, ws.SearchDate, u.Username, ws.Condition, ws.CurrentTemp, ws.WindSpeed, ws.WindDeg, ws.Icon FROM WeatherSearches ws JOIN Users u ON ws.UserId = u.Id WHERE ws.Id = @Id", conn);
-            cmd.Parameters.AddWithValue("@Id", id);
+            using var cmd = new SqlCommand(RepositoryConstants.GetWeatherSearchById, conn);
+            cmd.Parameters.AddWithValue(RepositoryConstants.ParamId, id);
 
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
@@ -169,8 +167,7 @@ namespace WeatherApp.Services.Repositories
                     Condition = reader.IsDBNull(8) ? null : reader.GetString(8),
                     CurrentTemp = reader.IsDBNull(9) ? (double?)null : reader.GetDouble(9),
                     WindSpeed = reader.IsDBNull(10) ? (double?)null : reader.GetDouble(10),
-                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11),
-                    Icon = reader.IsDBNull(12) ? null : reader.GetString(12)
+                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11)
                 };
             }
             return null;

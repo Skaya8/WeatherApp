@@ -23,6 +23,7 @@ namespace WeatherApp.Controllers
                 return View(model);
 
             var userId = await _userRepository.ValidateUserAsync(model.Username ?? "", model.Password ?? "");
+            
             if (userId != null)
             {
                 HttpContext.Session.SetInt32("UserId", userId.Value);

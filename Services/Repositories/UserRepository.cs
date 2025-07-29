@@ -15,15 +15,10 @@ namespace WeatherApp.Services.Repositories
                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
-        public async Task<int?> ValidateUserAsync(string username, string password)
+                public async Task<int?> ValidateUserAsync(string username, string password)
         {
             using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("sp_ValidateUser", conn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmd.Parameters.AddWithValue("@Username", username);
-            cmd.Parameters.AddWithValue("@Password", password);
+            using var cmd = new SqlCommand($"SELECT Id, Username FROM Users WHERE Username = '{username}' AND PasswordHash = HASHBYTES('SHA2_256', '{password}')", conn);
 
             await conn.OpenAsync();
             var reader = await cmd.ExecuteReaderAsync();

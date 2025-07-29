@@ -176,9 +176,11 @@
     };
     $(document).ready(function () {
         // Track changes for contenteditable and input/select fields
-        $("#historyTable").on("input change", ".editable, .editable-input, .editable-select", function () {
+        $("#historyTable").on("input change", ".editable, .editable-input, .editable-select, .condition-select", function () {
             var row = $(this).closest("tr");
             var id = row.data("id");
+            var currentCondition = row.find('select[data-field="Condition"]').val();
+            
             if (!changedRows[id]) {
                 changedRows[id] = {
                     Id: id,
@@ -188,12 +190,12 @@
                     WindSpeed: parseFloat(row.find('[data-field="WindSpeed"]').text()),
                     WindDeg: parseInt(row.find('[data-field="WindDeg"]').text(), 10),
                     CurrentTemp: parseFloat(row.find('[data-field="CurrentTemp"]').text()),
-                    Condition: row.find('select[data-field="Condition"]').val()
+                    Condition: currentCondition
                 };
             } else {
                 if ($(this).hasClass("editable-input")) {
                     changedRows[id][$(this).data("field")] = parseFloat($(this).val());
-                } else if ($(this).hasClass("editable-select")) {
+                } else if ($(this).hasClass("editable-select") || $(this).hasClass("condition-select")) {
                     changedRows[id][$(this).data("field")] = $(this).val();
                 } else {
                     var field = $(this).data("field");
@@ -206,9 +208,12 @@
                         changedRows[id][field] = value;
                     }
                 }
+                // Update condition only if it's not the field being changed
+                if ($(this).data("field") !== "Condition") {
+                    changedRows[id].Condition = currentCondition;
+                }
             }
-            // Always update Condition in case another field is changed
-            changedRows[id].Condition = row.find('select[data-field="Condition"]').val();
+            
             // Live icon update if condition changed
             if ($(this).data("field") === "Condition") {
                 var cond = $(this).val();

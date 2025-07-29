@@ -33,6 +33,13 @@ namespace WeatherApp.Services.Repositories
 
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
+            
+            // Ensure we have enough columns before reading
+            if (reader.FieldCount < 12)
+            {
+                throw new InvalidOperationException($"Expected 12 columns but got {reader.FieldCount} columns from the database query.");
+            }
+            
             while (await reader.ReadAsync())
             {
                 results.Add(new WeatherSearchResult
@@ -74,26 +81,39 @@ namespace WeatherApp.Services.Repositories
 
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                results.Add(new WeatherSearchResult
-                {
-                    Id = reader.GetInt32(0),
-                    City = reader.GetString(2),
-                    Humidity = reader.GetInt32(3),
-                    TempMin = reader.GetDouble(4),
-                    TempMax = reader.GetDouble(5),
-                    SearchDate = reader.GetDateTime(6),
-                    Username = reader.GetString(7),
-                    Condition = reader.IsDBNull(8) ? null : reader.GetString(8),
-                    CurrentTemp = reader.IsDBNull(9) ? (double?)null : reader.GetDouble(9),
-                    WindSpeed = reader.IsDBNull(10) ? (double?)null : reader.GetDouble(10),
-                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11)
-                });
-            }
-            if (await reader.NextResultAsync() && await reader.ReadAsync())
+            
+            // First result set: Get total count
+            if (await reader.ReadAsync())
             {
                 totalCount = reader.GetInt32(0);
+            }
+            
+            // Move to the second result set (weather data)
+            if (await reader.NextResultAsync())
+            {
+                // Ensure we have enough columns before reading
+                if (reader.FieldCount < 12)
+                {
+                    throw new InvalidOperationException($"Expected 12 columns but got {reader.FieldCount} columns from the database query.");
+                }
+                
+                while (await reader.ReadAsync())
+                {
+                    results.Add(new WeatherSearchResult
+                    {
+                        Id = reader.GetInt32(0),
+                        City = reader.GetString(2),
+                        Humidity = reader.GetInt32(3),
+                        TempMin = reader.GetDouble(4),
+                        TempMax = reader.GetDouble(5),
+                        SearchDate = reader.GetDateTime(6),
+                        Username = reader.GetString(7),
+                        Condition = reader.IsDBNull(8) ? null : reader.GetString(8),
+                        CurrentTemp = reader.IsDBNull(9) ? (double?)null : reader.GetDouble(9),
+                        WindSpeed = reader.IsDBNull(10) ? (double?)null : reader.GetDouble(10),
+                        WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11)
+                    });
+                }
             }
             return (results, totalCount);
         }

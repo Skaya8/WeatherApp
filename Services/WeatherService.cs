@@ -26,18 +26,17 @@ namespace WeatherApp.Services
         }
 
         public async Task<List<WeatherSearchResult>> GetWeatherSearchesAsync(
-            int? userId = null, string? city = null, string? username = null, 
-            DateTime? fromDate = null, DateTime? toDate = null)
+            int? userId = null, string? city = null, string? username = null)
         {
-            return await _weatherRepository.GetWeatherSearchesAsync(userId, city, username, fromDate, toDate);
+            return await _weatherRepository.GetWeatherSearchesAsync(userId, city, username);
         }
 
         public async Task<(List<WeatherSearchResult> Results, int TotalCount)> GetWeatherSearchesPagedAsync(
             int? userId, string? city, string? condition, string? username, 
-            DateTime? fromDate, DateTime? toDate, int page, int pageSize)
+            int page, int pageSize)
         {
             return await _weatherRepository.GetWeatherSearchesPagedAsync(
-                userId, city, condition, username, fromDate, toDate, page, pageSize);
+                userId, city, condition, username, page, pageSize);
         }
 
         public async Task SaveWeatherSearchAsync(WeatherViewModel model, int userId)

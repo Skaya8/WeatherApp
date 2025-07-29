@@ -17,7 +17,7 @@ namespace WeatherApp.Services.Repositories
         }
 
         public async Task<List<WeatherSearchResult>> GetWeatherSearchesAsync(
-            int? userId = null, string? city = null, string? username = null, DateTime? fromDate = null, DateTime? toDate = null)
+            int? userId = null, string? city = null, string? username = null)
         {
             var results = new List<WeatherSearchResult>();
             using var conn = new SqlConnection(_connectionString);
@@ -28,8 +28,6 @@ namespace WeatherApp.Services.Repositories
             cmd.Parameters.AddWithValue("@UserId", (object?)userId ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@City", (object?)city ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Username", (object?)username ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@FromDate", (object?)fromDate ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@ToDate", (object?)toDate ?? DBNull.Value);
 
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
@@ -61,7 +59,7 @@ namespace WeatherApp.Services.Repositories
         }
 
         public async Task<(List<WeatherSearchResult> Results, int TotalCount)> GetWeatherSearchesPagedAsync(
-            int? userId, string? city, string? condition, string? username, DateTime? fromDate, DateTime? toDate, int page, int pageSize)
+            int? userId, string? city, string? condition, string? username, int page, int pageSize)
         {
             var results = new List<WeatherSearchResult>();
             int totalCount = 0;
@@ -74,8 +72,6 @@ namespace WeatherApp.Services.Repositories
             cmd.Parameters.AddWithValue("@City", (object?)city ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Condition", (object?)condition ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Username", (object?)username ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@FromDate", (object?)fromDate ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@ToDate", (object?)toDate ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Page", page);
             cmd.Parameters.AddWithValue("@PageSize", pageSize);
 

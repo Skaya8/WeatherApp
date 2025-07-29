@@ -148,7 +148,7 @@
             @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
             {
                 <li class="page-item @(i == (int)ViewBag.Page ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", new { city = ViewBag.City, fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate, page = i })">@i</a>
+                    <a class="page-link" href="@Url.Action("Index", new { city = ViewBag.City, condition = ViewBag.Condition, page = i })">@i</a>
                 </li>
             }
         </ul>

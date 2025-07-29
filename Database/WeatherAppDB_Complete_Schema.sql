@@ -134,9 +134,7 @@ CREATE PROCEDURE [dbo].[sp_GetWeatherSearches]
     @UserId INT = NULL,
     @City NVARCHAR(100) = NULL,
     @Condition NVARCHAR(200) = NULL,
-    @Username NVARCHAR(50) = NULL,
-    @FromDate DATE = NULL,
-    @ToDate DATE = NULL
+    @Username NVARCHAR(50) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -149,8 +147,6 @@ BEGIN
     AND (@City IS NULL OR ws.City = @City)
     AND (@Condition IS NULL OR ws.Condition = @Condition)
     AND (@Username IS NULL OR u.Username = @Username)
-    AND (@FromDate IS NULL OR ws.SearchDate >= @FromDate)
-    AND (@ToDate IS NULL OR ws.SearchDate <= @ToDate)
     ORDER BY ws.SearchDate DESC
 END
 GO
@@ -164,8 +160,6 @@ CREATE PROCEDURE [dbo].[sp_GetWeatherSearchesPaged]
     @City NVARCHAR(100) = NULL,
     @Condition NVARCHAR(200) = NULL,
     @Username NVARCHAR(50) = NULL,
-    @FromDate DATE = NULL,
-    @ToDate DATE = NULL,
     @Page INT = 1,
     @PageSize INT = 10
 AS
@@ -179,9 +173,7 @@ BEGIN
     WHERE (@UserId IS NULL OR ws.UserId = @UserId)
     AND (@City IS NULL OR ws.City = @City)
     AND (@Condition IS NULL OR ws.Condition = @Condition)
-    AND (@Username IS NULL OR u.Username = @Username)
-    AND (@FromDate IS NULL OR ws.SearchDate >= @FromDate)
-    AND (@ToDate IS NULL OR ws.SearchDate <= @ToDate);
+    AND (@Username IS NULL OR u.Username = @Username);
     
     -- Get paginated results
     SELECT ws.Id, ws.UserId, ws.City, ws.Humidity, ws.TempMin, ws.TempMax, 
@@ -193,8 +185,6 @@ BEGIN
     AND (@City IS NULL OR ws.City = @City)
     AND (@Condition IS NULL OR ws.Condition = @Condition)
     AND (@Username IS NULL OR u.Username = @Username)
-    AND (@FromDate IS NULL OR ws.SearchDate >= @FromDate)
-    AND (@ToDate IS NULL OR ws.SearchDate <= @ToDate)
     ORDER BY ws.SearchDate DESC
     OFFSET (@Page - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY

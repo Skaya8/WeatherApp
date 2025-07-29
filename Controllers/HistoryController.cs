@@ -35,7 +35,7 @@ namespace WeatherApp.Controllers
 
             int pageSize = 10;
             var (results, totalCount) = await _weatherService.GetWeatherSearchesPagedAsync(
-                userId, city, condition, null, null, null, page, pageSize);
+                userId, city, condition, null, page, pageSize);
 
             ViewBag.Cities = await _cityRepository.GetAllCitiesAsync();
             ViewBag.Conditions = await _conditionRepository.GetAllConditionsAsync();

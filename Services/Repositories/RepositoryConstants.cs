@@ -32,8 +32,7 @@ namespace WeatherApp.Services.Repositories
         public const string ParamUserId = "@UserId";
         public const string ParamCity = "@City";
         public const string ParamUsername = "@Username";
-        public const string ParamFromDate = "@FromDate";
-        public const string ParamToDate = "@ToDate";
+
         public const string ParamCondition = "@Condition";
         public const string ParamPage = "@Page";
         public const string ParamPageSize = "@PageSize";

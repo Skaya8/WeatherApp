@@ -90,7 +90,9 @@
                 units: 'metric'
             }, function (data) {
                 $('#cityName').text(city);
-                $('#condition').text(data.weather[0].main + ' (' + data.weather[0].description + ')');
+                // Format condition to match our comprehensive list
+                var conditionText = data.weather[0].main + ' (' + data.weather[0].description + ')';
+                $('#condition').text(conditionText);
                 // Use OpenWeatherMap icon
                 $('#icon').attr('src', 'https://openweathermap.org/img/wn/' + data.weather[0].icon + '.png');
                 // Date

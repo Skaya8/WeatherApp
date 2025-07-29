@@ -5,28 +5,28 @@ using WeatherApp.Services.Repositories;
 
 namespace WeatherApp.Services.Repositories
 {
-    public class CityRepository : ICityRepository
+    public class ConditionRepository : IConditionRepository
     {
         private readonly string _connectionString;
 
-        public CityRepository(IConfiguration configuration)
+        public ConditionRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection") 
                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
-        public async Task<List<string>> GetAllCitiesAsync()
+        public async Task<List<string>> GetAllConditionsAsync()
         {
-            var cities = new List<string>();
+            var conditions = new List<string>();
             using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand(RepositoryConstants.GetAllCities, conn);
+            using var cmd = new SqlCommand(RepositoryConstants.GetAllConditions, conn);
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                cities.Add(reader.GetString(0));
+                conditions.Add(reader.GetString(0));
             }
-            return cities;
+            return conditions;
         }
     }
 } 

@@ -37,7 +37,7 @@ CREATE TABLE [dbo].[WeatherSearches](
     [TempMin] [float] NOT NULL,
     [TempMax] [float] NOT NULL,
     [SearchDate] [date] NOT NULL,
-    [Condition] [nvarchar](100) NULL,
+    [Condition] [nvarchar](200) NULL,
     [CurrentTemp] [float] NULL,
     [WindSpeed] [float] NULL,
     [WindDeg] [int] NULL,

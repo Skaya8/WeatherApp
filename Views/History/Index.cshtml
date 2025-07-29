@@ -2,17 +2,10 @@
 
 @{
     ViewData["Title"] = "Weather Search History";
-    var conditions = new[] {
-        "Clear (clear sky)",
-        "Clouds (few clouds)",
-        "Clouds (overcast clouds)",
-        "Rain",
-        "Snow",
-        "Thunderstorm",
-        "Drizzle",
-        "Mist",
-        "Fog"
-    };
+    var conditions = ViewBag.Conditions as List<string> ?? new List<string>();
+    var allConditions = ViewBag.AllConditions as string[] ?? new string[0];
+    var conditionIconMapping = ViewBag.ConditionIconMapping as Dictionary<string, string> ?? new Dictionary<string, string>();
+    var weatherConditionService = ViewBag.WeatherConditionService as WeatherApp.Services.Interfaces.IWeatherConditionService;
 }
 
 <div class="container mt-3">
@@ -99,20 +92,38 @@
         {
             <tr data-id="@Model[i].Id">
                 <td>@Model[i].City</td>
-                <td>
-                    <select class="form-select condition-select" data-field="Condition">
-                        @foreach (var cond in conditions)
-                        {
-                            if (Model[i].Condition == cond)
-                            {
-                                <option value="@cond" selected>@cond</option>
-                            }
-                            else
-                            {
-                                <option value="@cond">@cond</option>
-                            }
+                <td class="condition-cell">
+                    <div class="d-flex align-items-center">
+                        @{
+                            var iconUrl = weatherConditionService?.GetIconForCondition(Model[i].Condition);
                         }
-                    </select>
+                        @if (!string.IsNullOrEmpty(iconUrl))
+                        {
+                            <img src="@iconUrl" 
+                                 alt="@Model[i].Condition" 
+                                 class="weather-icon me-2" 
+                                 style="width: 32px; height: 32px;">
+                        }
+                        else
+                        {
+                            <div class="weather-icon me-2" style="width: 32px; height: 32px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">
+                                ?
+                            </div>
+                        }
+                        <select class="form-select condition-select" data-field="Condition">
+                            @foreach (var cond in allConditions)
+                            {
+                                if (Model[i].Condition == cond)
+                                {
+                                    <option value="@cond" selected>@cond</option>
+                                }
+                                else
+                                {
+                                    <option value="@cond">@cond</option>
+                                }
+                            }
+                        </select>
+                    </div>
                 </td>
                 <td><span class="editable" data-field="CurrentTemp" contenteditable="true">@Model[i].CurrentTemp</span>&deg;C</td>
                 <td><span class="editable" data-field="TempMin" contenteditable="true">@Model[i].TempMin</span>&deg;C</td>
@@ -162,18 +173,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.js"></script>
 <script>
     var changedRows = {};
-    // Map condition to icon URL (OpenWeatherMap style)
-    var conditionToIcon = {
-        "Clear (clear sky)": "https://openweathermap.org/img/wn/01d.png",
-        "Clouds (few clouds)": "https://openweathermap.org/img/wn/02d.png",
-        "Clouds (overcast clouds)": "https://openweathermap.org/img/wn/04d.png",
-        "Rain": "https://openweathermap.org/img/wn/09d.png",
-        "Snow": "https://openweathermap.org/img/wn/13d.png",
-        "Thunderstorm": "https://openweathermap.org/img/wn/11d.png",
-        "Drizzle": "https://openweathermap.org/img/wn/10d.png",
-        "Mist": "https://openweathermap.org/img/wn/50d.png",
-        "Fog": "https://openweathermap.org/img/wn/50d.png"
-    };
+    // Map condition to icon URL (OpenWeatherMap style) - dynamically generated from server
+    var conditionToIcon = @Html.Raw(Json.Serialize(conditionIconMapping));
     $(document).ready(function () {
         // Track changes for contenteditable and input/select fields
         $("#historyTable").on("input change", ".editable, .editable-input, .editable-select, .condition-select", function () {
@@ -218,11 +219,12 @@
             if ($(this).data("field") === "Condition") {
                 var cond = $(this).val();
                 var iconUrl = conditionToIcon[cond] || "";
-                var iconSpan = row.find('.icon-span');
+                var iconImg = row.find('.weather-icon');
                 if (iconUrl) {
-                    iconSpan.html('<img src="' + iconUrl + '" style="height:24px;vertical-align:middle;" />');
+                    iconImg.attr('src', iconUrl);
+                    iconImg.show();
                 } else {
-                    iconSpan.html('');
+                    iconImg.hide();
                 }
             }
         });

@@ -7,11 +7,22 @@ namespace WeatherApp.Services
     {
         private readonly IWeatherRepository _weatherRepository;
         private readonly IChangeLogRepository _changeLogRepository;
+        private readonly IWeatherConditionService _weatherConditionService;
+        private readonly IChangeDetectionService _changeDetectionService;
+        private readonly IValidationService _validationService;
 
-        public WeatherService(IWeatherRepository weatherRepository, IChangeLogRepository changeLogRepository)
+        public WeatherService(
+            IWeatherRepository weatherRepository, 
+            IChangeLogRepository changeLogRepository,
+            IWeatherConditionService weatherConditionService,
+            IChangeDetectionService changeDetectionService,
+            IValidationService validationService)
         {
             _weatherRepository = weatherRepository;
             _changeLogRepository = changeLogRepository;
+            _weatherConditionService = weatherConditionService;
+            _changeDetectionService = changeDetectionService;
+            _validationService = validationService;
         }
 
         public async Task<List<WeatherSearchResult>> GetWeatherSearchesAsync(
@@ -31,6 +42,15 @@ namespace WeatherApp.Services
 
         public async Task SaveWeatherSearchAsync(WeatherViewModel model, int userId)
         {
+            if (!_validationService.IsValidWeatherData(model))
+                throw new ArgumentException("Invalid weather data provided");
+
+            if (!_validationService.IsValidUserId(userId))
+                throw new ArgumentException("Invalid user ID provided");
+
+            // Normalize the condition to match our comprehensive list
+            var normalizedCondition = _weatherConditionService.NormalizeCondition(model.Condition);
+            
             await _weatherRepository.SaveWeatherSearchAsync(
                 userId,
                 model.City ?? "",
@@ -38,7 +58,7 @@ namespace WeatherApp.Services
                 model.TempMin ?? 0,
                 model.TempMax ?? 0,
                 DateTime.Today,
-                model.Condition,
+                normalizedCondition,
                 model.CurrentTemp,
                 model.WindSpeed,
                 model.WindDeg
@@ -50,7 +70,15 @@ namespace WeatherApp.Services
             var old = await _weatherRepository.GetWeatherSearchByIdAsync(change.Id);
             if (old == null) return;
 
-            await UpdateChangedFields(old, change, userId);
+            var changes = await _changeDetectionService.DetectChangesAsync(old, change);
+            
+            foreach (var fieldChange in changes)
+            {
+                await _weatherRepository.UpdateWeatherSearchAsync(
+                    change.Id, userId, change.Humidity, change.TempMin, change.TempMax,
+                    change.CurrentTemp, change.Condition, change.WindSpeed, change.WindDeg,
+                    fieldChange.FieldName, fieldChange.OldValue, fieldChange.NewValue);
+            }
         }
 
         public async Task<List<WeatherSearchChangeLog>> GetChangeLogAsync(int weatherSearchId)
@@ -58,83 +86,6 @@ namespace WeatherApp.Services
             return await _changeLogRepository.GetWeatherSearchChangesAsync(weatherSearchId);
         }
 
-        private async Task UpdateChangedFields(WeatherSearchResult old, WeatherSearchResult change, int userId)
-        {
-            if (old.Humidity != change.Humidity)
-            {
-                await _weatherRepository.UpdateWeatherSearchAsync(
-                    change.Id, userId, change.Humidity, change.TempMin, change.TempMax,
-                    change.CurrentTemp, change.Condition, change.WindSpeed, change.WindDeg,
-                    "Humidity", old.Humidity.ToString(), change.Humidity.ToString());
-            }
 
-            if (Math.Abs(old.TempMin - change.TempMin) > 0.0001)
-            {
-                await _weatherRepository.UpdateWeatherSearchAsync(
-                    change.Id, userId, change.Humidity, change.TempMin, change.TempMax,
-                    change.CurrentTemp, change.Condition, change.WindSpeed, change.WindDeg,
-                    "TempMin", old.TempMin.ToString(), change.TempMin.ToString());
-            }
-
-            if (Math.Abs(old.TempMax - change.TempMax) > 0.0001)
-            {
-                await _weatherRepository.UpdateWeatherSearchAsync(
-                    change.Id, userId, change.Humidity, change.TempMin, change.TempMax,
-                    change.CurrentTemp, change.Condition, change.WindSpeed, change.WindDeg,
-                    "TempMax", old.TempMax.ToString(), change.TempMax.ToString());
-            }
-
-            if (HasCurrentTempChanged(old, change))
-            {
-                await _weatherRepository.UpdateWeatherSearchAsync(
-                    change.Id, userId, change.Humidity, change.TempMin, change.TempMax,
-                    change.CurrentTemp, change.Condition, change.WindSpeed, change.WindDeg,
-                    "CurrentTemp", 
-                    old.CurrentTemp.HasValue ? old.CurrentTemp.Value.ToString() : "",
-                    change.CurrentTemp.HasValue ? change.CurrentTemp.Value.ToString() : "");
-            }
-
-            if (old.Condition != change.Condition)
-            {
-                await _weatherRepository.UpdateWeatherSearchAsync(
-                    change.Id, userId, change.Humidity, change.TempMin, change.TempMax,
-                    change.CurrentTemp, change.Condition, change.WindSpeed, change.WindDeg,
-                    "Condition", old.Condition ?? "", change.Condition ?? "");
-            }
-
-            if (HasWindSpeedChanged(old, change))
-            {
-                await _weatherRepository.UpdateWeatherSearchAsync(
-                    change.Id, userId, change.Humidity, change.TempMin, change.TempMax,
-                    change.CurrentTemp, change.Condition, change.WindSpeed, change.WindDeg,
-                    "WindSpeed",
-                    old.WindSpeed.HasValue ? old.WindSpeed.Value.ToString() : "",
-                    change.WindSpeed.HasValue ? change.WindSpeed.Value.ToString() : "");
-            }
-
-            if (old.WindDeg != change.WindDeg)
-            {
-                await _weatherRepository.UpdateWeatherSearchAsync(
-                    change.Id, userId, change.Humidity, change.TempMin, change.TempMax,
-                    change.CurrentTemp, change.Condition, change.WindSpeed, change.WindDeg,
-                    "WindDeg",
-                    old.WindDeg.HasValue ? old.WindDeg.Value.ToString() : "",
-                    change.WindDeg.HasValue ? change.WindDeg.Value.ToString() : "");
-            }
-        }
-
-        private static bool HasCurrentTempChanged(WeatherSearchResult old, WeatherSearchResult change)
-        {
-            return old.CurrentTemp.HasValue && change.CurrentTemp.HasValue && 
-                   Math.Abs(old.CurrentTemp.Value - change.CurrentTemp.Value) > 0.0001 ||
-                   (old.CurrentTemp.HasValue != change.CurrentTemp.HasValue);
-        }
-
-        private static bool HasWindSpeedChanged(WeatherSearchResult old, WeatherSearchResult change)
-        {
-            return old.WindSpeed.HasValue && change.WindSpeed.HasValue && 
-                   Math.Abs(old.WindSpeed.Value - change.WindSpeed.Value) > 0.0001 ||
-                   (old.WindSpeed.HasValue != change.WindSpeed.HasValue);
-        }
     }
 } 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WeatherApp.Services;
 using WeatherApp.Services.Interfaces;
 using WeatherApp.Models;
+using WeatherApp.Services.Constants;
 
 namespace WeatherApp.Controllers
 {
@@ -9,11 +10,19 @@ namespace WeatherApp.Controllers
     {
         private readonly IWeatherService _weatherService;
         private readonly ICityRepository _cityRepository;
+        private readonly IConditionRepository _conditionRepository;
+        private readonly IWeatherConditionService _weatherConditionService;
         
-        public HistoryController(IWeatherService weatherService, ICityRepository cityRepository)
+        public HistoryController(
+            IWeatherService weatherService, 
+            ICityRepository cityRepository,
+            IConditionRepository conditionRepository,
+            IWeatherConditionService weatherConditionService)
         {
             _weatherService = weatherService;
             _cityRepository = cityRepository;
+            _conditionRepository = conditionRepository;
+            _weatherConditionService = weatherConditionService;
         }
 
         [HttpGet]
@@ -29,6 +38,10 @@ namespace WeatherApp.Controllers
                 userId, city, condition, null, null, null, page, pageSize);
 
             ViewBag.Cities = await _cityRepository.GetAllCitiesAsync();
+            ViewBag.Conditions = await _conditionRepository.GetAllConditionsAsync();
+            ViewBag.AllConditions = _weatherConditionService.GetAllConditions();
+            ViewBag.ConditionIconMapping = _weatherConditionService.GetConditionIconMapping();
+            ViewBag.WeatherConditionService = _weatherConditionService;
             ViewBag.City = string.IsNullOrEmpty(city) ? "" : city;
             ViewBag.Condition = string.IsNullOrEmpty(condition) ? "" : condition;
             ViewBag.Page = page;

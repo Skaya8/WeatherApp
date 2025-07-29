@@ -10,19 +10,20 @@ builder.Services.AddScoped<IWeatherRepository, WeatherRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IChangeLogRepository, ChangeLogRepository>();
 builder.Services.AddScoped<ICityRepository, CityRepository>();
+builder.Services.AddScoped<IConditionRepository, ConditionRepository>();
 
 // Register services
 builder.Services.AddScoped<IWeatherService, WeatherService>();
-
-// Legacy service for backward compatibility
-builder.Services.AddScoped<WeatherDbService>();
+builder.Services.AddScoped<IWeatherConditionService, WeatherConditionService>();
+builder.Services.AddScoped<IChangeDetectionService, ChangeDetectionService>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
 
 builder.Services.AddSession();
 
 var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Account/Login");
     app.UseHsts();
 }
 

@@ -415,3 +415,23 @@ input[type="number"].editable-input:focus {
   box-shadow: 0 2px 8px #0d355733;
   cursor: default;
 }
+
+/* Weather Icons */
+.weather-icon {
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.weather-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Condition dropdown with icon */
+.condition-cell {
+  min-width: 200px;
+}
+
+.condition-cell .d-flex {
+  gap: 8px;
+}

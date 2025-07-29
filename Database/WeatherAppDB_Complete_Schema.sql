@@ -51,7 +51,7 @@ GO
 CREATE TABLE [dbo].[WeatherSearchChangeLog](
     [Id] [int] IDENTITY(1,1) NOT NULL,
     [WeatherSearchId] [int] NOT NULL,
-    [UserId] [int] NULL,
+    [UserId] [int] NOT NULL,
     [ChangeDate] [datetime] NOT NULL DEFAULT (getdate()),
     [ChangeType] [nvarchar](100) NOT NULL,
     [OldValue] [nvarchar](255) NULL,

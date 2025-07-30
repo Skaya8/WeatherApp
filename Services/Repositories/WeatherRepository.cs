@@ -32,7 +32,6 @@ namespace WeatherApp.Services.Repositories
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
             
-            // Ensure we have enough columns before reading
             if (reader.FieldCount < 12)
             {
                 throw new InvalidOperationException($"Expected 12 columns but got {reader.FieldCount} columns from the database query.");
@@ -78,16 +77,13 @@ namespace WeatherApp.Services.Repositories
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
             
-            // First result set: Get total count
             if (await reader.ReadAsync())
             {
                 totalCount = reader.GetInt32(0);
             }
             
-            // Move to the second result set (weather data)
             if (await reader.NextResultAsync())
             {
-                // Ensure we have enough columns before reading
                 if (reader.FieldCount < 12)
                 {
                     throw new InvalidOperationException($"Expected 12 columns but got {reader.FieldCount} columns from the database query.");

@@ -10,21 +10,18 @@ namespace WeatherApp.Services
             if (string.IsNullOrWhiteSpace(condition))
                 return string.Empty;
 
-            // Try to find exact match first
             var exactMatch = WeatherConditions.GetConditionByDescription(condition);
             if (exactMatch != null)
                 return exactMatch.ToString();
 
-            // Try to match by main condition
             var mainCondition = ExtractMainCondition(condition);
             if (!string.IsNullOrEmpty(mainCondition))
             {
                 var conditions = WeatherConditions.GetConditionsByMain(mainCondition);
                 if (conditions.Length > 0)
-                    return conditions[0]; // Return first match for that main condition
+                    return conditions[0]; 
             }
 
-            // If no match found, return the original condition
             return condition;
         }
 
@@ -33,12 +30,10 @@ namespace WeatherApp.Services
             if (string.IsNullOrWhiteSpace(condition))
                 return null;
 
-            // Extract main condition from "Main (description)" format
             var openParenIndex = condition.IndexOf('(');
             if (openParenIndex > 0)
                 return condition.Substring(0, openParenIndex).Trim();
 
-            // If no parentheses, assume the whole string is the main condition
             return condition.Trim();
         }
 
@@ -65,21 +60,18 @@ namespace WeatherApp.Services
             if (string.IsNullOrWhiteSpace(condition))
                 return string.Empty;
 
-            // First try to find exact match
             var weatherCondition = WeatherConditions.GetConditionByDescription(condition);
             if (weatherCondition?.Icon != null)
             {
                 return $"https://openweathermap.org/img/wn/{weatherCondition.Icon}.png";
             }
 
-            // If no exact match, try to extract the description from "Main (description)" format
             var mainCondition = ExtractMainCondition(condition);
             if (!string.IsNullOrEmpty(mainCondition))
             {
                 var conditions = WeatherConditions.GetConditionsByMain(mainCondition);
                 if (conditions.Length > 0)
                 {
-                    // Find the condition that matches the description part
                     var descriptionPart = condition.Replace($"{mainCondition} (", "").Replace(")", "");
                     var matchingCondition = WeatherConditions.AllConditions.FirstOrDefault(c => 
                         c.Main.Equals(mainCondition, StringComparison.OrdinalIgnoreCase) && 

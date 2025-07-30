@@ -4,7 +4,6 @@ namespace WeatherApp.Services.Constants
     {
         public static readonly WeatherCondition[] AllConditions = new[]
         {
-            // Thunderstorm Group (2xx)
             new WeatherCondition("Thunderstorm", "thunderstorm with light rain", "11d"),
             new WeatherCondition("Thunderstorm", "thunderstorm with rain", "11d"),
             new WeatherCondition("Thunderstorm", "thunderstorm with heavy rain", "11d"),
@@ -15,8 +14,6 @@ namespace WeatherApp.Services.Constants
             new WeatherCondition("Thunderstorm", "thunderstorm with light drizzle", "11d"),
             new WeatherCondition("Thunderstorm", "thunderstorm with drizzle", "11d"),
             new WeatherCondition("Thunderstorm", "thunderstorm with heavy drizzle", "11d"),
-
-            // Drizzle Group (3xx)
             new WeatherCondition("Drizzle", "light intensity drizzle", "09d"),
             new WeatherCondition("Drizzle", "drizzle", "09d"),
             new WeatherCondition("Drizzle", "heavy intensity drizzle", "09d"),
@@ -26,8 +23,6 @@ namespace WeatherApp.Services.Constants
             new WeatherCondition("Drizzle", "shower rain and drizzle", "09d"),
             new WeatherCondition("Drizzle", "heavy shower rain and drizzle", "09d"),
             new WeatherCondition("Drizzle", "shower drizzle", "09d"),
-
-            // Rain Group (5xx)
             new WeatherCondition("Rain", "light rain", "10d"),
             new WeatherCondition("Rain", "moderate rain", "10d"),
             new WeatherCondition("Rain", "heavy intensity rain", "10d"),
@@ -38,8 +33,6 @@ namespace WeatherApp.Services.Constants
             new WeatherCondition("Rain", "shower rain", "09d"),
             new WeatherCondition("Rain", "heavy intensity shower rain", "09d"),
             new WeatherCondition("Rain", "ragged shower rain", "09d"),
-
-            // Snow Group (6xx)
             new WeatherCondition("Snow", "light snow", "13d"),
             new WeatherCondition("Snow", "snow", "13d"),
             new WeatherCondition("Snow", "heavy snow", "13d"),
@@ -51,8 +44,6 @@ namespace WeatherApp.Services.Constants
             new WeatherCondition("Snow", "light shower snow", "13d"),
             new WeatherCondition("Snow", "shower snow", "13d"),
             new WeatherCondition("Snow", "heavy shower snow", "13d"),
-
-            // Atmosphere Group (7xx)
             new WeatherCondition("Mist", "mist", "50d"),
             new WeatherCondition("Smoke", "smoke", "50d"),
             new WeatherCondition("Haze", "haze", "50d"),
@@ -63,11 +54,7 @@ namespace WeatherApp.Services.Constants
             new WeatherCondition("Ash", "volcanic ash", "50d"),
             new WeatherCondition("Squall", "squalls", "50d"),
             new WeatherCondition("Tornado", "tornado", "50d"),
-
-            // Clear Group (800)
             new WeatherCondition("Clear", "clear sky", "01d"),
-
-            // Clouds Group (80x)
             new WeatherCondition("Clouds", "few clouds: 11-25%", "02d"),
             new WeatherCondition("Clouds", "scattered clouds: 25-50%", "03d"),
             new WeatherCondition("Clouds", "broken clouds: 51-84%", "04d"),

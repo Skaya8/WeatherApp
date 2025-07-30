@@ -49,10 +49,10 @@ namespace WeatherApp.Services.Repositories
                     TempMax = reader.GetDouble(5),
                     SearchDate = reader.GetDateTime(6),
                     Username = reader.GetString(7),
-                    Condition = reader.IsDBNull(8) ? null : reader.GetString(8),
-                    CurrentTemp = reader.IsDBNull(9) ? (double?)null : reader.GetDouble(9),
-                    WindSpeed = reader.IsDBNull(10) ? (double?)null : reader.GetDouble(10),
-                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11)
+                    Condition = reader.GetString(8),
+                    CurrentTemp = reader.GetDouble(9),
+                    WindSpeed = reader.GetDouble(10),
+                    WindDeg = reader.GetInt32(11)
                 });
             }
             return results;
@@ -104,10 +104,10 @@ namespace WeatherApp.Services.Repositories
                         TempMax = reader.GetDouble(5),
                         SearchDate = reader.GetDateTime(6),
                         Username = reader.GetString(7),
-                        Condition = reader.IsDBNull(8) ? null : reader.GetString(8),
-                        CurrentTemp = reader.IsDBNull(9) ? (double?)null : reader.GetDouble(9),
-                        WindSpeed = reader.IsDBNull(10) ? (double?)null : reader.GetDouble(10),
-                        WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11)
+                        Condition = reader.GetString(8),
+                        CurrentTemp = reader.GetDouble(9),
+                        WindSpeed = reader.GetDouble(10),
+                        WindDeg = reader.GetInt32(11)
                     });
                 }
             }
@@ -128,10 +128,10 @@ namespace WeatherApp.Services.Repositories
             cmd.Parameters.AddWithValue("@TempMin", tempMin);
             cmd.Parameters.AddWithValue("@TempMax", tempMax);
             cmd.Parameters.AddWithValue("@SearchDate", searchDate);
-            cmd.Parameters.AddWithValue("@Condition", (object?)condition ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@CurrentTemp", (object?)currentTemp ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@WindSpeed", (object?)windSpeed ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@WindDeg", (object?)windDeg ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Condition", condition ?? "");
+            cmd.Parameters.AddWithValue("@CurrentTemp", currentTemp ?? 0.0);
+            cmd.Parameters.AddWithValue("@WindSpeed", windSpeed ?? 0.0);
+            cmd.Parameters.AddWithValue("@WindDeg", windDeg ?? 0);
 
             await conn.OpenAsync();
             await cmd.ExecuteNonQueryAsync();
@@ -149,10 +149,10 @@ namespace WeatherApp.Services.Repositories
             cmd.Parameters.AddWithValue("@Humidity", humidity);
             cmd.Parameters.AddWithValue("@TempMin", tempMin);
             cmd.Parameters.AddWithValue("@TempMax", tempMax);
-            cmd.Parameters.AddWithValue("@CurrentTemp", (object?)currentTemp ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@Condition", (object?)condition ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@WindSpeed", (object?)windSpeed ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@WindDeg", (object?)windDeg ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@CurrentTemp", currentTemp ?? 0.0);
+            cmd.Parameters.AddWithValue("@Condition", condition ?? "");
+            cmd.Parameters.AddWithValue("@WindSpeed", windSpeed ?? 0.0);
+            cmd.Parameters.AddWithValue("@WindDeg", windDeg ?? 0);
             cmd.Parameters.AddWithValue("@ChangeType", changeType);
             cmd.Parameters.AddWithValue("@OldValue", oldValue);
             cmd.Parameters.AddWithValue("@NewValue", newValue);
@@ -180,10 +180,10 @@ namespace WeatherApp.Services.Repositories
                     TempMax = reader.GetDouble(5),
                     SearchDate = reader.GetDateTime(6),
                     Username = reader.GetString(7),
-                    Condition = reader.IsDBNull(8) ? null : reader.GetString(8),
-                    CurrentTemp = reader.IsDBNull(9) ? (double?)null : reader.GetDouble(9),
-                    WindSpeed = reader.IsDBNull(10) ? (double?)null : reader.GetDouble(10),
-                    WindDeg = reader.IsDBNull(11) ? (int?)null : reader.GetInt32(11)
+                    Condition = reader.GetString(8),
+                    CurrentTemp = reader.GetDouble(9),
+                    WindSpeed = reader.GetDouble(10),
+                    WindDeg = reader.GetInt32(11)
                 };
             }
             return null;

@@ -147,7 +147,7 @@ BEGIN
     AND (@City IS NULL OR ws.City = @City)
     AND (@Condition IS NULL OR ws.Condition = @Condition)
     AND (@Username IS NULL OR u.Username = @Username)
-    ORDER BY ws.SearchDate DESC
+    ORDER BY ws.SearchDate DESC, ws.Id DESC
 END
 GO
 
@@ -185,7 +185,7 @@ BEGIN
     AND (@City IS NULL OR ws.City = @City)
     AND (@Condition IS NULL OR ws.Condition = @Condition)
     AND (@Username IS NULL OR u.Username = @Username)
-    ORDER BY ws.SearchDate DESC
+    ORDER BY ws.SearchDate DESC, ws.Id DESC
     OFFSET (@Page - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY
 END

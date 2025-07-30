@@ -19,24 +19,38 @@ namespace WeatherApp.Services
         public async Task<int?> ValidateUserCredentialsAsync(string username, string password)
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-                return null;
-
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand(
-                "SELECT Id, Username FROM Users WHERE Username = @Username AND PasswordHash = HASHBYTES('SHA2_256', @Password)", 
-                conn);
-            
-            cmd.Parameters.AddWithValue("@Username", username);
-            cmd.Parameters.AddWithValue("@Password", password);
-
-            await conn.OpenAsync();
-            var reader = await cmd.ExecuteReaderAsync();
-            
-            if (await reader.ReadAsync())
             {
-                return reader.GetInt32(0);
+                Console.WriteLine($"Validation failed: Username or password is null/empty");
+                return null;
             }
-            return null;
+
+            try
+            {
+                using var conn = new SqlConnection(_connectionString);
+                using var cmd = new SqlCommand("sp_ValidateUser", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                
+                cmd.Parameters.AddWithValue("@Username", username);
+                cmd.Parameters.AddWithValue("@Password", password);
+
+                await conn.OpenAsync();
+                var reader = await cmd.ExecuteReaderAsync();
+                
+                if (await reader.ReadAsync())
+                {
+                    var userId = reader.GetInt32(0);
+                    Console.WriteLine($"User validation successful for username: {username}, UserId: {userId}");
+                    return userId;
+                }
+                
+                Console.WriteLine($"User validation failed for username: {username} - no matching user found");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during user validation for username {username}: {ex.Message}");
+                return null;
+            }
         }
 
         public async Task<bool> IsUsernameAvailableAsync(string username)

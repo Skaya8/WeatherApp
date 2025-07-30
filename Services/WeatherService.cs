@@ -41,13 +41,17 @@ namespace WeatherApp.Services
 
         public async Task SaveWeatherSearchAsync(WeatherViewModel model, int userId)
         {
-            if (!_validationService.IsValidWeatherData(model))
-                throw new ArgumentException("Invalid weather data provided");
+            var weatherValidation = _validationService.ValidateWeatherData(model);
+            if (!weatherValidation.IsValid)
+            {
+                var errorMessage = string.Join("; ", weatherValidation.Errors.Concat(weatherValidation.FieldErrors.Values));
+                throw new ArgumentException($"Invalid weather data provided: {errorMessage}");
+            }
 
-            if (!_validationService.IsValidUserId(userId))
+            if (userId <= 0)
                 throw new ArgumentException("Invalid user ID provided");
 
-            // Normalize the condition to match our comprehensive list
+
             var normalizedCondition = _weatherConditionService.NormalizeCondition(model.Condition);
             
             await _weatherRepository.SaveWeatherSearchAsync(

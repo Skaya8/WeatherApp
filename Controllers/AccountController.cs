@@ -7,10 +7,10 @@ namespace WeatherApp.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUserRepository _userRepository;
-        public AccountController(IUserRepository userRepository)
+        private readonly IValidationService _validationService;
+        public AccountController(IValidationService validationService)
         {
-            _userRepository = userRepository;
+            _validationService = validationService;
         }
 
         [HttpGet]
@@ -22,7 +22,7 @@ namespace WeatherApp.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var userId = await _userRepository.ValidateUserAsync(model.Username ?? "", model.Password ?? "");
+            var userId = await _validationService.ValidateUserCredentialsAsync(model.Username ?? "", model.Password ?? "");
             
             if (userId != null)
             {

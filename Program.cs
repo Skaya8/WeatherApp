@@ -16,7 +16,6 @@ builder.Services.AddScoped<IConditionRepository, ConditionRepository>();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
 builder.Services.AddScoped<IWeatherConditionService, WeatherConditionService>();
 builder.Services.AddScoped<IChangeDetectionService, ChangeDetectionService>();
-builder.Services.AddScoped<IValidationService, ValidationService>();
 
 builder.Services.AddSession();
 
